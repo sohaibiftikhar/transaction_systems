@@ -1,0 +1,75 @@
+\documentclass[
+%journal=ancac3, % for ACS Nano
+%journal=acbcct, % for ACS Chem. Biol.
+journal=jacsat, % for undefined journal
+manuscript=article]{achemso}
+
+\usepackage[version=3]{mhchem} % Formula subscripts using \ce{}
+\usepackage{mathtools}
+
+\newcommand*{\mycommand}[1]{\texttt{\emph{#1}}}
+
+\author{Sohaib Iftikhar}
+\email{sohaib.iftikhar@tum.de}
+\title[\texttt{achemso} demonstration]
+{Transaction Systems Assignment 2}
+
+\begin{document}
+\begin{center}
+Matrkl No: 03681005
+\end{center}
+
+\section{Exercise 1}
+Given the schedule and that transactions 3 and 4 copiers. 
+\[s = r_{1}(x) r_{3}(x) w_{3}(y) w_{2}(x) c_{3} r_{4}(y) w_{4}(x) c_{2} r_{5}(x) c_{4} w_{5}(z) w_{1}(z) c_{1} c_{5}\]
+Calculate the Herbert semantics.
+\subsection{Solution}
+% \tag*{Pythagoras}
+\[H_{s}(r_{1}(x)) = f_{0x}()\]
+\[H_{s}(r_{3}(x)) = f_{0x}()\]
+\[H_{s}(w_{3}(y)) = f_{0y}() \tag*{Copier}\]
+\[H_{s}(w_{2}(x)) = f_{2x}() \tag*{No Input}\]
+\[H_{s}(r_{4}(y)) = H_{s}(w_{3}(y)) = f_{0y}()\]
+\[H_{s}(w_{4}(x)) = f_{2x}() \tag*{Copier}\]
+\[H_{s}(r_{5}(x)) = H_{s}(w_{4}(x) = f_{2x}()\]
+\[H_{s}(w_{5}(z)) = f_{5z}(H_{s}(r_{5}(x))) = f_{5z}(f_{2x}())\]
+\[H_{s}(w_{1}(z)) = f_{1z}(H_{s}(r_{1}(x))) = f_{1z}(f_{0x}())\]
+\\
+Using these we can calculate the semantics for the schedule s as:
+\[H_{s}\{s\}(x) = H_{s}(w_{4}(x)) = f_{2x}()\]
+\[H_{s}\{s\}(y) = H_{s}(w_{3}(y)) = f_{0y}()\]
+\[H_{s}\{s\}(z) = H_{s}(w_{1}(z)) = f_{1z}(f_{0x}())\]
+
+\section{Exercise 2}
+Given the schedule
+\[s = r_{1}(x) r_{3}(x) w_{3}(y) w_{2}(x) r_{4}(y) c_{2} w_{4}(x) c_{4} r_{5}(x) c_{3} w_{5}(z) c_{5} w_{1}(z) c_{1}\]
+Does it belong to FSR? CSR?
+\subsection{Solution}
+The schedule is the same as the previous exercise except there are not copiers. We first calculate the Herbert semantics for this schedule.
+\[H_{s}(r_{1}(x)) = f_{0x}()\]
+\[H_{s}(r_{3}(x)) = f_{0x}()\]
+\[H_{s}(w_{3}(y)) = f_{3y}(f_{0x}())\]
+\[H_{s}(w_{2}(x)) = f_{2x}()\]
+\[H_{s}(r_{4}(y)) = H_{s}(w_{3}(y)) = f_{3y}(f_{0x}())\]
+\[H_{s}(w_{4}(x)) = f_{4x}(H_s(r_{4}(y)) = f_{4x}(f_{3y}(f_{0x}()))\]
+\[H_{s}(r_{5}(x)) = H_{s}(w_{4}(x) = f_{4x}(f_{3y}(f_{0x}()))\]
+\[H_{s}(w_{5}(z)) = f_{5z}(H_{s}(r_{5}(x))) = f_{5z}(f_{4x}(f_{3y}(f_{0x}())))\]
+\[H_{s}(w_{1}(z)) = f_{1z}(H_{s}(r_{1}(x))) = f_{1z}(f_{0x}())\]
+\\
+Using these we can calculate the semantics for the schedule s as:
+\[H_{s}\{s\}(x) = H_{s}(w_{4}(x)) = f_{4x}(f_{3y}(f_{0x}()))\]
+\[H_{s}\{s\}(y) = H_{s}(w_{3}(y)) = f_{3y}(f_{0x}())\]
+\[H_{s}\{s\}(z) = H_{s}(w_{1}(z)) = f_{1z}(f_{0x}())\]
+\\
+Looking at this we can say $T_2$ and $T_5$ are not needed for the final states. As a result they must be placed in such a way that they do not alter the result. Since $T_2$ writes $x$ but $T_3$ and $T_1$ read the original $x$ for their output $T_1$ and $T_3$ must occur before $T_2$. Now $T_4$ depends on $T_3$ for input for variable $y$ which means $T_3$ must occur before $T_4$. Finally $T_5$ must finish before $T_1$ as $T_1$ must override the value of $z$ written by $T_5$. We can conclude that the following sequence for the transaction 
+$T_{5}T_{1}T_{3}T_{2}T_{4}$ maybe produce the same Herbert semantics. We can verify this now with the new schedule.
+\[ s' = r_{5}(x) w_{5}(z) c_{5} r_{1}(x) w_{1}(z) c_{1} r_{3}(x) w_{3}(y) c_{3} w_{2}(x) c_{2} r_{4}(y) w_{4}(x) \]
+We calculate the Herbert semantics for this new schedule:
+\[
+H_{s}\{s\}(x) = H_{s}(w_{4}(x)) = f_{4x}(H_{s}(r_{4}(y))) = f_{4x}(H_s(w_3{y})) = f_{4x}(f_{3y}(H_s(r_{3}(x)))) = f_{4x}(f_{3y}(f_{0x}()))
+\]
+\[ H_{s}\{s\}(y) = H_{s}(w_{3}(y)) = f_{3y}(H_s(r_{3}(x))) = f_{3y}(f_{0x}()) \]
+\[ H_{s}\{s\}(z) = H_{s}(w_{1}(z)) = f_{1z}(H_{s}(r_{1}(x))) = f_{1z}(f_{0x}()) \]
+
+Now by the definition of FSR since the Herbert semantics of the two sequences are equivalent the schedule is FSR.
+\end{document}
